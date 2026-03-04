@@ -27,7 +27,7 @@ function App() {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [initializeKeys]);
 
   const initializeKeys = React.useCallback(async (userData) => {
     try {

@@ -92,16 +92,7 @@ function Chat({ user, onLogout, keysGenerated }) {
     };
   }, [keysGenerated, handleReceiveMessage, handlePendingMessages, handleMessageSent]);
 
-  const loadContacts = async () => {
-    try {
-      const response = await keysAPI.getAllUsers();
-      setContacts(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Failed to load contacts:', error);
-      setLoading(false);
-    }
-  };
+
 
   const extractId = (value) => {
     if (!value) return null;
