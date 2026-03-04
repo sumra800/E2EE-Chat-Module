@@ -4,11 +4,11 @@
   "description": "End-to-End Encrypted Chat Module for Study Buddy",
   "main": "server/index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "node api.js && concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon server/index.js",
     "client": "cd client && npm start",
     "install-all": "npm install && cd client && npm install",
-    "build": "cd client && npm run build"
+    "build": "node api.js && cd client && npm run build"
   },
   "keywords": [
     "e2ee",
@@ -33,4 +33,3 @@
     "concurrently": "^8.2.2"
   }
 }
-

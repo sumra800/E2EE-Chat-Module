@@ -41,15 +41,29 @@ app.use((req, res, next) => {
 
 // MongoDB connection
 const mongoUri = process.env.MONGODB_URI;
+
 if (!mongoUri) {
-  console.error('FATAL: MONGODB_URI environment variable is not defined!');
+  console.warn('WARNING: MONGODB_URI environment variable is not defined! Defaulting to local MongoDB.');
 } else {
-  console.log('MONGODB_URI is defined (length: ' + mongoUri.length + ')');
+  console.log('MONGODB_URI is provided. Attempting to connect...');
 }
 
-mongoose.connect(mongoUri || 'mongodb://localhost:27017/studybuddy_e2ee')
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
+const connectionOptions = {
+  // Add any specific options here if needed, but remove deprecated ones
+};
+
+mongoose.connect(mongoUri || 'mongodb://localhost:27017/studybuddy_e2ee', connectionOptions)
+  .then(() => {
+    console.log('--- MongoDB Connection Successful ---');
+    console.log(`Connected to database: ${mongoose.connection.name}`);
+    console.log(`Host: ${mongoose.connection.host}`);
+  })
+  .catch(err => {
+    console.error('--- MongoDB Connection Error ---');
+    console.error('Error name:', err.name);
+    console.error('Error message:', err.message);
+    if (err.reason) console.error('Error reason:', err.reason);
+  });
 
 // Routes
 app.use('/api/auth', authRoutes);
