@@ -133,7 +133,7 @@ This document provides a comprehensive security analysis of the End-to-End Encry
 
 ### Security Tests
 
-#### Test 5: Replay Attack Prevention
+#### Test 5: Replay Attack
 - **Objective**: Verify old messages cannot be replayed
 - **Method**: Attempt to resend old encrypted message
 - **Result**: ⚠️ PARTIAL - Sequence numbers prevent ordering issues, but no explicit replay detection
