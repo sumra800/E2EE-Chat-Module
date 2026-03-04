@@ -34,8 +34,8 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/studybudd
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -45,6 +45,15 @@ app.use('/api/chat', chatRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'E2EE Chat Server is running' });
+});
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Study Buddy E2EE Chat Server is running',
+    version: '1.0.0'
+  });
 });
 
 // Initialize Socket.IO
