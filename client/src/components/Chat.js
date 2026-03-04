@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Chat.css';
 import ContactList from './ContactList';
 import ChatWindow from './ChatWindow';
@@ -12,6 +12,46 @@ function Chat({ user, onLogout, keysGenerated }) {
   const [messages, setMessages] = useState({});
   const [loading, setLoading] = useState(true);
   const [recipientPublicKey, setRecipientPublicKey] = useState(null);
+
+  const handleReceiveMessage = useCallback(async (data) => {
+    try {
+      // Decrypt message
+      const plaintext = await cryptoUtils.decryptMessage(
+        data.ciphertext,
+        data.encryptedKey,
+        data.iv,
+        data.authTag
+      );
+
+      const message = {
+        id: data.messageId,
+        senderId: data.senderId,
+        receiverId: user.id,
+        plaintext,
+        timestamp: new Date(data.timestamp),
+        sent: false,
+      };
+
+      setMessages(prev => ({
+        ...prev,
+        [data.senderId]: [...(prev[data.senderId] || []), message],
+      }));
+    } catch (error) {
+      console.error('Failed to decrypt message:', error);
+      alert('Failed to decrypt received message.');
+    }
+  }, [user.id]);
+
+  const handlePendingMessages = useCallback(async (pendingMessages) => {
+    for (const msg of pendingMessages) {
+      await handleReceiveMessage(msg);
+    }
+  }, [handleReceiveMessage]);
+
+  const handleMessageSent = useCallback((data) => {
+    console.log('Message sent confirmation:', data);
+    // Update message status if needed
+  }, []);
 
   useEffect(() => {
     if (!keysGenerated) {
@@ -30,6 +70,17 @@ function Chat({ user, onLogout, keysGenerated }) {
       socketService.onMessageSent(handleMessageSent);
 
       // Load contacts
+      const loadContacts = async () => {
+        try {
+          const response = await keysAPI.getAllUsers();
+          setContacts(response.data);
+          setLoading(false);
+        } catch (error) {
+          console.error('Failed to load contacts:', error);
+          setLoading(false);
+        }
+      };
+
       loadContacts();
     }
 
@@ -39,7 +90,7 @@ function Chat({ user, onLogout, keysGenerated }) {
       socketService.removeListener('pending_messages', handlePendingMessages);
       socketService.removeListener('message_sent', handleMessageSent);
     };
-  }, [keysGenerated]);
+  }, [keysGenerated, handleReceiveMessage, handlePendingMessages, handleMessageSent]);
 
   const loadContacts = async () => {
     try {
@@ -106,7 +157,7 @@ function Chat({ user, onLogout, keysGenerated }) {
       ...prev,
       [contact.id]: prev[contact.id] || [],
     }));
-    
+
     try {
       // Load recipient's public key
       const response = await keysAPI.getPublicKey(contact.id);
@@ -154,45 +205,7 @@ function Chat({ user, onLogout, keysGenerated }) {
     }
   };
 
-  const handleReceiveMessage = async (data) => {
-    try {
-      // Decrypt message
-      const plaintext = await cryptoUtils.decryptMessage(
-        data.ciphertext,
-        data.encryptedKey,
-        data.iv,
-        data.authTag
-      );
 
-      const message = {
-        id: data.messageId,
-        senderId: data.senderId,
-        receiverId: user.id,
-        plaintext,
-        timestamp: new Date(data.timestamp),
-        sent: false,
-      };
-
-      setMessages(prev => ({
-        ...prev,
-        [data.senderId]: [...(prev[data.senderId] || []), message],
-      }));
-    } catch (error) {
-      console.error('Failed to decrypt message:', error);
-      alert('Failed to decrypt received message.');
-    }
-  };
-
-  const handlePendingMessages = async (pendingMessages) => {
-    for (const msg of pendingMessages) {
-      await handleReceiveMessage(msg);
-    }
-  };
-
-  const handleMessageSent = (data) => {
-    console.log('Message sent confirmation:', data);
-    // Update message status if needed
-  };
 
   return (
     <div className="chat-container">

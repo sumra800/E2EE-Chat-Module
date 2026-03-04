@@ -29,7 +29,7 @@ function App() {
     }
   }, []);
 
-  const initializeKeys = async (userData) => {
+  const initializeKeys = React.useCallback(async (userData) => {
     try {
       if (!userData?.id) {
         throw new Error('Missing user information for key initialization');
@@ -37,7 +37,7 @@ function App() {
       cryptoUtils.setActiveUser(userData.id);
       // Try to load keys from storage
       const keysLoaded = await cryptoUtils.loadKeysFromStorage(userData.id);
-      
+
       if (!keysLoaded) {
         // Generate new keys if not found
         if (!userData.hasPublicKey) {
@@ -56,7 +56,7 @@ function App() {
       console.error('Key initialization error:', error);
       setLoading(false);
     }
-  };
+  }, []);
 
   const generateAndUploadKeys = async (userId) => {
     try {
@@ -66,14 +66,14 @@ function App() {
       cryptoUtils.setActiveUser(userId);
       // Generate key pair
       await cryptoUtils.generateKeyPair();
-      
+
       // Export and upload public key
       const publicKeyPem = await cryptoUtils.exportPublicKey();
       await keysAPI.uploadPublicKey(publicKeyPem);
-      
+
       // Save keys to IndexedDB
       await cryptoUtils.saveKeysToStorage(userId);
-      
+
       setKeysGenerated(true);
       console.log('Keys generated and uploaded successfully');
     } catch (error) {
@@ -87,7 +87,7 @@ function App() {
       const response = await authAPI.login(email, password);
       const token = response.data.token;
       localStorage.setItem('token', token);
-      
+
       const userData = response.data.user;
       setUser(userData);
       cryptoUtils.setActiveUser(userData.id);
@@ -102,7 +102,7 @@ function App() {
       const response = await authAPI.register(username, email, password);
       const token = response.data.token;
       localStorage.setItem('token', token);
-      
+
       const userData = response.data.user;
       setUser(userData);
       cryptoUtils.setActiveUser(userData.id);

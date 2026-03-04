@@ -315,7 +315,7 @@ class CryptoUtils {
   generateFingerprint(publicKeyPem) {
     const encoder = new TextEncoder();
     const data = encoder.encode(publicKeyPem);
-    
+
     return window.crypto.subtle.digest('SHA-256', data)
       .then(hashBuffer => {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -423,5 +423,7 @@ class CryptoUtils {
   }
 }
 
-export default new CryptoUtils();
+
+const cryptoUtilsInstance = new CryptoUtils();
+export default cryptoUtilsInstance;
 

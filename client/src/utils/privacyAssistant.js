@@ -87,7 +87,7 @@ class PrivacyAssistant {
    */
   getWarningMessage(message) {
     const warnings = this.scanMessage(message);
-    
+
     if (warnings.length === 0) {
       return null;
     }
@@ -106,5 +106,7 @@ class PrivacyAssistant {
   }
 }
 
-export default new PrivacyAssistant();
+
+const privacyAssistantInstance = new PrivacyAssistant();
+export default privacyAssistantInstance;
 
