@@ -43,10 +43,14 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('--- Registration Error ---');
+    console.error('Message:', error.message);
+    console.error('Stack:', error.stack);
+
     res.status(500).json({
       error: 'Server error during registration',
       details: error.message,
+      // Only include stack in dev, but for now we'll keep details for the user
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
