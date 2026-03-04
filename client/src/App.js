@@ -10,25 +10,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [keysGenerated, setKeysGenerated] = useState(false);
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('token');
-    if (token) {
-      authAPI.getCurrentUser()
-        .then(response => {
-          setUser(response.data);
-          cryptoUtils.setActiveUser(response.data.id);
-          initializeKeys(response.data);
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, [initializeKeys]);
-
   const initializeKeys = React.useCallback(async (userData) => {
     try {
       if (!userData?.id) {
@@ -57,6 +38,25 @@ function App() {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      authAPI.getCurrentUser()
+        .then(response => {
+          setUser(response.data);
+          cryptoUtils.setActiveUser(response.data.id);
+          initializeKeys(response.data);
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [initializeKeys]);
 
   const generateAndUploadKeys = async (userId) => {
     try {
