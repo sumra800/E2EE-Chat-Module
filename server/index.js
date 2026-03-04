@@ -31,15 +31,23 @@ app.use(express.json());
 
 // Request logger for debugging
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - ${res.statusCode} - ${duration}ms`);
+  });
   next();
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/studybuddy_e2ee', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+const mongoUri = process.env.MONGODB_URI;
+if (!mongoUri) {
+  console.error('FATAL: MONGODB_URI environment variable is not defined!');
+} else {
+  console.log('MONGODB_URI is defined (length: ' + mongoUri.length + ')');
+}
+
+mongoose.connect(mongoUri || 'mongodb://localhost:27017/studybuddy_e2ee')
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
