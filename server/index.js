@@ -29,6 +29,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Request logger for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/studybuddy_e2ee', {
   useNewUrlParser: true,
@@ -53,6 +59,14 @@ app.get('/', (req, res) => {
     status: 'ok',
     message: 'Study Buddy E2EE Chat Server is running',
     version: '1.0.0'
+  });
+});
+
+// API Info route (prevents "Cannot GET /api")
+app.get('/api', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'E2EE Chat API is live. Use /api/auth, /api/keys, or /api/chat endpoints.'
   });
 });
 
