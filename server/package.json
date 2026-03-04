@@ -4,8 +4,8 @@
   "description": "Backend server for E2EE chat module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node init && node index.js",
+    "dev": "node init && nodemon index.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
